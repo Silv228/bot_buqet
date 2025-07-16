@@ -61,7 +61,7 @@ bot.on('text', async msg => {
                     let users1 = []
                     const rowsId1 = await ids.getRows();
                     const monthRow = await month.getRows();
-                    const col = month.headerValues.findIndex(el => el == `${new Date().toLocaleString([], { day: "2-digit" })}.${new Date().toLocaleString([], { month: "2-digit" })}`)
+                    const col = month.headerValues.findIndex(el => el == `${new Date().toLocaleString("ru", { day: "2-digit" })}.${new Date().toLocaleString("ru", { month: "2-digit" })}`)
                     for (let i = 0; i < rowsId1.length; i++) {
                         users1.push([rowsId1[i].get('id'), rowsId1[i].get('name'), rowsId1[i].get('role')]);
                     }
@@ -76,7 +76,7 @@ bot.on('text', async msg => {
                             for (let j = 0; j < 35; j++) {
                                 if (month.getCell(i + 1, col).value === null) {
                                     let cellStart = month.getCell(i, col)
-                                    cellStart.value = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                                    cellStart.value = new Date().toLocaleTimeString("ru", { timeZone: '+05:00', hour: '2-digit', minute: '2-digit' });
                                     await month.saveUpdatedCells();
                                     break
                                 }
@@ -101,7 +101,7 @@ bot.on('text', async msg => {
                                     month.getCell(monthRow.length + 3, 0).value = role
                                     let cellStart = month.getCell(monthRow.length + 2, col)
                                     console.log(i, 'i')
-                                    cellStart.value = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                                    cellStart.value = new Date().toLocaleTimeString("ru", { timeZone: '+05:00', hour: '2-digit', minute: '2-digit' });
                                     // cellStart.value = 'start'
                                     await month.saveUpdatedCells();
                                 }
@@ -121,7 +121,7 @@ bot.on('text', async msg => {
                                     month.getCell(monthRow.length + 1, 0).value = role
                                     let cellStart = month.getCell(monthRow.length, col)
                                     console.log(i, monthRow.length)
-                                    cellStart.value = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                                    cellStart.value = new Date().toLocaleTimeString("ru", { timeZone: '+05:00', hour: '2-digit', minute: '2-digit' });
                                     await month.saveUpdatedCells();
                                 }
                                 // await monthRow[i].save();
@@ -147,7 +147,7 @@ bot.on('text', async msg => {
                     let users2 = []
                     const rowsId2 = await ids.getRows();
                     const monthRow2 = await month.getRows();
-                    const col1 = month.headerValues.findIndex(el => el == `${new Date().toLocaleString([], { day: "2-digit" })}.${new Date().toLocaleString([], { month: "2-digit" })}`)
+                    const col1 = month.headerValues.findIndex(el => el == `${new Date().toLocaleString("ru", { day: "2-digit" })}.${new Date().toLocaleString("ru", { month: "2-digit" })}`)
                     for (let i = 0; i < rowsId2.length; i++) {
                         users2.push([rowsId2[i].get('id'), rowsId2[i].get('name'), rowsId2[i].get('role')]);
                     }
@@ -159,7 +159,7 @@ bot.on('text', async msg => {
                             for (let j = 1; j < 35; j++) {
                                 if (month.getCell(i + 1, col1).value === null) {
                                     let cellEnd = month.getCell(i + 1, col1)
-                                    cellEnd.value = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                                    cellEnd.value = new Date().toLocaleTimeString("ru", { timeZone: '+05:00', hour: '2-digit', minute: '2-digit' });
                                     await month.saveUpdatedCells();
                                     let cellDiff = month.getCell(i + 2, col1)
                                     let minutes = (month.getCell(i + 1, col1).value.split(':')[0] * 60 + month.getCell(i + 1, col1).value.split(':')[1]) - (month.getCell(i, col1).value.split(':')[0] * 60 + month.getCell(i, col1).value.split(':')[1])
