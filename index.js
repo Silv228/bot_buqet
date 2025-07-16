@@ -31,7 +31,8 @@ bot.on('text', async msg => {
         for (let i = 0; i < rowsId.length; i++) {
             users.push([rowsId[i].get('id'), rowsId[i].get('name'), rowsId[i].get('role')]);
         }
-        if (!users.find((el) => el[0] === `@${msg.chat.username}`)) {
+        console.log(msg.from.id, users)
+        if (!users.find((el) => +el[0] === msg.from.id)) {
             await bot.sendMessage(msg.chat.id, 'У вас нет доступа!')
         }
         else {
@@ -39,11 +40,10 @@ bot.on('text', async msg => {
                 case '/start':
                     let users = []
                     const rowsId = await ids.getRows()
-
                     for (let i = 0; i < rowsId.length; i++) {
                         users.push([rowsId[i].get('id'), rowsId[i].get('name'), rowsId[i].get('role')]);
                     }
-                    if (!users.find((el) => el[0] === `@${msg.chat.username}`)) {
+                    if (!users.find((el) => +el[0] === msg.from.id)) {
                         await bot.sendMessage(msg.chat.id, 'У вас нет доступа!')
                     }
                     else {
@@ -51,7 +51,7 @@ bot.on('text', async msg => {
                             reply_markup: {
                                 keyboard: [
                                     ['Начать'],
-                                    ['доход']
+                                    ['Доход']
                                 ]
                             }
                         })
@@ -65,8 +65,8 @@ bot.on('text', async msg => {
                     for (let i = 0; i < rowsId1.length; i++) {
                         users1.push([rowsId1[i].get('id'), rowsId1[i].get('name'), rowsId1[i].get('role')]);
                     }
-                    const name = users1.find((el) => el[0] === `@${msg.chat.username}`)[1]
-                    const role = users1.find((el) => el[0] === `@${msg.chat.username}`)[2]
+                    const name = users1.find((el) => +el[0] === msg.from.id)[1]
+                    const role = users1.find((el) => +el[0] === msg.from.id)[2]
                     await month.loadCells({ startRowIndex: 0, startColumnIndex: 0 })
                     const nameCol = month.headerValues.findIndex(el => el === 'имя')
                     monthRow.length = monthRow.length > 0 ? monthRow.length : 2
@@ -90,36 +90,39 @@ bot.on('text', async msg => {
                                     for (let k = 0; k < month.headerValues.length; k++) {
                                         const cell = month.getCell(monthRow.length + 2, k)
                                         cell.backgroundColor = {
-                                            red: 255,
-                                            blue: 100,
-                                            green: 100,
-                                            alpha: 20
+                                            red: 10,
+                                            blue: 1,
+                                            green: 10,
+                                            alpha: 10
                                         }
                                     }
                                     await month.saveUpdatedCells();
                                     month.getCell(monthRow.length + 2, 0).value = name
                                     month.getCell(monthRow.length + 3, 0).value = role
-                                    let cellStart = month.getCell(i, col)
+                                    let cellStart = month.getCell(monthRow.length + 2, col)
                                     console.log(i, 'i')
                                     cellStart.value = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                                    // cellStart.value = 'start'
+                                    await month.saveUpdatedCells();
                                 }
                                 else {
+                                    monthRow.length = 2
                                     for (let k = 0; k < month.headerValues.length; k++) {
-                                        const cell = month.getCell(i, k)
+                                        const cell = month.getCell(monthRow.length, k)
                                         cell.backgroundColor = {
-                                            red: 255,
-                                            blue: 100,
-                                            green: 100,
-                                            alpha: 20
+                                            red: 40,
+                                            blue: 1,
+                                            green: 10,
+                                            alpha: 10
                                         }
                                     }
                                     await month.saveUpdatedCells();
                                     month.getCell(monthRow.length, 0).value = name
                                     month.getCell(monthRow.length + 1, 0).value = role
-                                    let cellStart = month.getCell(i, col)
-                                    await month.saveUpdatedCells();
+                                    let cellStart = month.getCell(monthRow.length, col)
                                     console.log(i, monthRow.length)
                                     cellStart.value = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                                    await month.saveUpdatedCells();
                                 }
                                 // await monthRow[i].save();
                                 await month.saveUpdatedCells();
@@ -152,11 +155,9 @@ bot.on('text', async msg => {
                     await month.loadCells({ startRowIndex: 0, startColumnIndex: 0 })
                     const summaryCol = month.headerValues.findIndex(el => el === 'сумма часов')
                     for (let i = 0; i <= monthRow2.length; i++) {
-                        // console.log(month.getCell(i, nameCol1))
-                        if (month.getCell(i, nameCol1).value === users2.find((el) => el[0] === `@${msg.chat.username}`)[1]) {
+                        if (month.getCell(i, nameCol1).value === users2.find((el) => +el[0] === msg.from.id)[1]) {
                             for (let j = 1; j < 35; j++) {
-                                if (month.getCell(i + 2, col1).value === null) {
-
+                                if (month.getCell(i + 1, col1).value === null) {
                                     let cellEnd = month.getCell(i + 1, col1)
                                     cellEnd.value = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                                     await month.saveUpdatedCells();
@@ -165,14 +166,16 @@ bot.on('text', async msg => {
                                     cellDiff.value = `${Math.floor(minutes / 60) % 99}:${minutes % 60}`
                                     console.log(`${Math.floor(minutes / 60)}:${minutes % 60}`)
                                     await month.saveUpdatedCells();
-                                    const sumCell = month.getCell(i, summaryCol).value
+                                    const sumCell = Number(String(month.getCell(i, summaryCol).value).replace(',', '.'))
                                     let sum = 0
+                                    console.log(sumCell, summaryCol)
                                     if (!sumCell) {
-                                        sum = minutes
+                                        sum = ((minutes / 60) % 99)
                                     }
                                     else {
                                         sum = sumCell + ((minutes / 60) % 99)
                                     }
+                                    console.log(sum)
                                     const priceCol = month.headerValues.findIndex(el => el === 'ставка')
                                     const planCol = month.headerValues.findIndex(el => el === 'план')
                                     const factCol = month.headerValues.findIndex(el => el === 'факт')
@@ -180,25 +183,27 @@ bot.on('text', async msg => {
                                     const summary_sCol = month.headerValues.findIndex(el => el === 'доход от плана')
                                     const resultCol = month.headerValues.findIndex(el => el === 'итог')
                                     let price = month.getCell(i, priceCol).value
-                                    let k1 = Number(monthRow2[0].get('k1').replace(',', '.'))
-                                    let k2 = Number(monthRow2[0].get('k2').replace(',', '.'))
+                                    // console.log(monthRow2[i - 1], month.getCell(i, priceCol).value, month.getCell(i - 1, priceCol).value)
+                                    let k1 = Number(monthRow2[i - 1].get('k1').replace(',', '.'))
+                                    let k2 = Number(monthRow2[i - 1].get('k2').replace(',', '.'))
                                     let plan = month.getCell(i, planCol).value ? +month.getCell(i, planCol).value : 0
                                     let fact = +month.getCell(i, factCol).value
-                                    let summary_s = !month.getCell(1, summary_sCol).value ? 0 : Number(month.getCell(1, summary_sCol).value.replace(',', '.'))
+                                    let summary_s = !month.getCell(i, summary_sCol).value ? 0 : Number(String(month.getCell(i, summary_sCol).value).replace(',', '.'))
+                                    console.log(month.getCell(i, summary_sCol).value, 'план')
                                     if (fact >= plan) {
                                         summary_s += fact * (k2 / 100)
                                     }
                                     else {
                                         summary_s += fact * (k1 / 100)
                                     }
-                                    console.log(summary_s)
-                                    month.getCell(i, summaryCol).value = (sum / 60).toFixed(2)
+                                    console.log(price, k1, k2, sum, summary_s)
+                                    month.getCell(i, summaryCol).value = sum.toFixed(2)
                                     await month.saveUpdatedCells();
-                                    month.getCell(i, summary_hCol).value = (Number(price) * (sum / 60)).toFixed(2)
+                                    month.getCell(i, summary_hCol).value = (Number(price) * sum).toFixed(2)
                                     await month.saveUpdatedCells();
                                     month.getCell(i, summary_sCol).value = (summary_s).toFixed(2)
                                     await month.saveUpdatedCells();
-                                    month.getCell(i, resultCol).value = (summary_s + Number(price) * (Number(String(sum).replace(',', '.')) / 60)).toFixed(2)
+                                    month.getCell(i, resultCol).value = (summary_s + Number(price) * (Number(String(sum).replace(',', '.')))).toFixed(2)
                                     await month.saveUpdatedCells();
                                     break
                                 }
@@ -208,7 +213,7 @@ bot.on('text', async msg => {
                         }
                     }
 
-                    await bot.sendMessage(msg.chat.id, 'Чтобы закончить смену нажмите кнопку "Начать"', {
+                    await bot.sendMessage(msg.chat.id, 'Чтобы начать смену нажмите кнопку "Начать"', {
                         reply_markup: {
                             keyboard: [
                                 ['Начать'],
@@ -217,9 +222,10 @@ bot.on('text', async msg => {
                         }
                     })
                     break
-                case 'доход':
+                case 'Доход':
                     let users3 = []
                     const rowsId3 = await ids.getRows();
+                    await month.loadCells({ startRowIndex: 0, startColumnIndex: 0 })
                     const monthRow3 = await month.getRows();
                     const resultCol = month.headerValues.findIndex(el => el === 'итог')
                     const nameCol2 = month.headerValues.findIndex(el => el === 'имя')
@@ -227,7 +233,7 @@ bot.on('text', async msg => {
                         users3.push([rowsId3[i].get('id'), rowsId3[i].get('name')]);
                     }
                     for (let i = 0; i <= monthRow3.length; i++) {
-                        if (month.getCell(i, nameCol2).value === users3.find((el) => el[0] === `@${msg.chat.username}`)[1]) {
+                        if (month.getCell(i, nameCol2).value === users3.find((el) => +el[0] === msg.from.id)[1]) {
                             const sal_id = await bot.sendMessage(msg.chat.id, `Ваш доход - ${month.getCell(i, resultCol).value} рублей`)
                             console.log(sal_id.message_id)
                             setTimeout(() => {
