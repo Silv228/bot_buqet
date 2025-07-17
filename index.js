@@ -175,7 +175,7 @@ bot.on('text', async msg => {
                                     cellDiff.value = `${Math.floor(minutes / 60) % 99}:${minutes % 60}`
                                     console.log(`${Math.floor(minutes / 60)}:${minutes % 60}`)
                                     await month.saveUpdatedCells();
-                                    const sumCell = Number(String(month.getCell(i, summaryCol).value).replace(',', '.'))
+                                    const sumCell = month.getCell(i, summaryCol).value ? Number(String(month.getCell(i, summaryCol).value).replace(',', '.')) : null
                                     let sum = 0
                                     console.log(sumCell, summaryCol)
                                     if (!sumCell) {
