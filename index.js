@@ -3,13 +3,7 @@ import { GoogleSpreadsheet } from 'google-spreadsheet';
 import { JWT } from 'google-auth-library';
 import http from "http"
 
-http.createServer(function (request, response) {
 
-    response.end("Hello NodeJS!");
-
-}).listen(8080, "0.0.0.0", function () {
-    console.log("Сервер начал прослушивание запросов на порту 3000");
-});
 
 const TOKEN = '7839533817:AAG-Uo_7LETNmWFqZviDAaw9CnUAcOqphRY'
 
@@ -32,6 +26,13 @@ const bot = new TelegramBot(TOKEN, {
 
 bot.on('text', async msg => {
     try {
+http.createServer(function (request, response) {
+
+    response.end("Hello NodeJS!");
+
+}).listen(8080, "0.0.0.0", function () {
+    console.log("Сервер начал прослушивание запросов на порту 3000");
+});
         const month_cur = new Date().getMonth()
         const month = doc.sheetsByIndex[month_cur + 1]
         let users = []
