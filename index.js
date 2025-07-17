@@ -1,6 +1,15 @@
 import TelegramBot from 'node-telegram-bot-api';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 import { JWT } from 'google-auth-library';
+import http from "http"
+
+http.createServer(function (request, response) {
+
+    response.end("Hello NodeJS!");
+
+}).listen(3000, "127.0.0.1", function () {
+    console.log("Сервер начал прослушивание запросов на порту 3000");
+});
 
 const TOKEN = '7839533817:AAG-Uo_7LETNmWFqZviDAaw9CnUAcOqphRY'
 
